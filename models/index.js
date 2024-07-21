@@ -19,10 +19,12 @@ Tag.belongsToMany(Note, { through: NoteTag, foreignKey: 'tagId' });
 
 const syncModels = async () => {
     try {
-        await sequelize.sync();
-        console.log('Database synchronized');
+        await sequelize.authenticate();
+        console.log('Database connection has been established successfully.');
+        await sequelize.sync({ force: true }); // or { alter: true } if you want to apply changes
     } catch (error) {
-        console.error('Error syncing database:', error);
+        console.error('Unable to connect to the database:', error);
+        throw error;
     }
 };
 
@@ -32,5 +34,6 @@ module.exports = {
     Tag,
     Note,
     NoteTag,
-    syncModels
+    syncModels,
+    sequelize
 };
