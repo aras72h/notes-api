@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const authMiddleware = require('../middlewares/authMiddleware');
+const { authenticateToken } = require('../middlewares/authMiddleware');
 
 const SECRET_KEY = process.env.SECRET_KEY;
 
@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
 
 
 // Get a specific user's details
-router.get('/users/:id', authMiddleware, async (req, res) => {
+router.get('/users/:id', authenticateToken, async (req, res) => {
     try {
         const user = await User.findByPk(req.params.id);
         if (!user) {
@@ -58,7 +58,7 @@ router.get('/users/:id', authMiddleware, async (req, res) => {
 
 
 // Update a user's details
-router.put('/users/:id', authMiddleware, async (req, res) => {
+router.put('/users/:id', authenticateToken, async (req, res) => {
     try {
         const { username, email, password } = req.body;
         const user = await User.findByPk(req.params.id);
@@ -79,7 +79,7 @@ router.put('/users/:id', authMiddleware, async (req, res) => {
 
 
 // Delete a user
-router.delete('/users/:id', authMiddleware, async (req, res) => {
+router.delete('/users/:id', authenticateToken, async (req, res) => {
     try {
         const user = await User.findByPk(req.params.id);
         if (!user) {
