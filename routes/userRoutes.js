@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const authMiddleware = require('../middlewares/authMiddleware');
+
+const SECRET_KEY = process.env.SECRET_KEY;
+
 
 // Register a new user
 router.post('/users', async (req, res) => {
@@ -15,8 +20,31 @@ router.post('/users', async (req, res) => {
     }
 });
 
+
+// Login a user
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
+
+        const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
+        res.json({ token });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 // Get a specific user's details
-router.get('/users/:id', async (req, res) => {
+router.get('/users/:id', authMiddleware, async (req, res) => {
     try {
         const user = await User.findByPk(req.params.id);
         if (!user) {
@@ -28,8 +56,9 @@ router.get('/users/:id', async (req, res) => {
     }
 });
 
+
 // Update a user's details
-router.put('/users/:id', async (req, res) => {
+router.put('/users/:id', authMiddleware, async (req, res) => {
     try {
         const { username, email, password } = req.body;
         const user = await User.findByPk(req.params.id);
@@ -48,8 +77,9 @@ router.put('/users/:id', async (req, res) => {
     }
 });
 
+
 // Delete a user
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', authMiddleware, async (req, res) => {
     try {
         const user = await User.findByPk(req.params.id);
         if (!user) {
@@ -61,5 +91,6 @@ router.delete('/users/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 module.exports = router;
