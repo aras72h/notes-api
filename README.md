@@ -11,20 +11,9 @@ This is a Note-Taking API built with Node.js, Express, Sequelize, and PostgreSQL
 - Associating notes with tags
 - Sequelize ORM for database management
 - Environment variable configuration using dotenv
+- **bcrypt** for secure password hashing
+- **jsonwebtoken** (JWT) for user authentication and session management
 
-## Security Features
-
-### Password Hashing
-
-The application uses **bcrypt** for securely hashing user passwords. When a user registers or updates their password, it is hashed using bcrypt’s `hash` method with a salt rounds value of 10, ensuring that passwords are stored securely in the database.
-
-**bcrypt** is a widely-used library that provides strong security by hashing passwords in a way that is resistant to brute-force attacks.
-
-### Authentication
-
-For authentication and managing user sessions, the application uses **jsonwebtoken** (JWT). JWTs are used to generate tokens upon user login, which are then used to authenticate subsequent requests.
-
-**jsonwebtoken** allows us to create signed tokens that can be verified on the server to ensure that the user is authenticated. The tokens include user information and have a configurable expiration time to enhance security.
 
 ## Table of Contents
 
